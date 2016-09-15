@@ -61,6 +61,7 @@ export default connect(
   state => state,
   dispatch => ({
     move: (indexA, indexB) => {
+      console.log('move', indexA, indexB);
       dispatch({
         type: 'MOVE',
         payload: {indexA, indexB}
