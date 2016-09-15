@@ -1,6 +1,7 @@
 {
-  "name": "draggable-bug",
+  "name": "react-draggable-list-bug-redux",
   "version": "0.1.0",
+  "homepage": "http://nervetattoo.github.io/react-draggable-list-bug-redux/build",
   "private": true,
   "devDependencies": {
     "react-scripts": "0.4.1"
