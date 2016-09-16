@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
+import { reduxForm, Field, FieldArray } from 'redux-form'
 import { connect } from 'react-redux'
 import cx from 'classnames';
 import DraggableList from 'react-draggable-list';
 
 import './App.css';
 
+const renderPlanet = ({ input, name }) => {
+  return (
+    <h2>{ input.value }</h2>
+  )
+}
 class Planet extends React.Component {
   getDragHeight() {
     return this.props.item.subtitle ? 47 : 28;
@@ -23,49 +29,55 @@ class Planet extends React.Component {
           transform: `scale(${scale})`,
           boxShadow: `rgba(0, 0, 0, 0.3) 0px ${shadow}px ${2 * shadow}px 0px`
         }}>
-        {dragHandle(<h2>{ item.name }</h2>)}
+        {dragHandle(
+          <Field name={item.name} component={renderPlanet} />
+        )}
       </div>
     );
   }
 }
 
+const renderPlanets = ({ fields, ...props }) => {
+  const planets = fields.map((name, index) => ({
+    key: props.planets[index],
+    name
+  }))
+  return (
+    <DraggableList
+      itemKey="key"
+      template={Planet}
+      list={planets}
+      onMoveEnd={(newList, obj, indexA, indexB) => fields.move(indexA, indexB)}
+      />
+    )
+}
+
 class App extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      useContainer: false,
-    }
-  }
-
   render() {
-    const planets = this.props.planets.map((name, key) => ({name,key}))
-    const { useContainer } = this.state
-
+    const { planets } = this.props.initialValues
     return (
       <div className="App">
         <div className="App-intro" ref="container">
-          <DraggableList
-            itemKey="key"
-            template={Planet}
-            list={planets}
-            onMoveEnd={(newList, obj, indexA, indexB) => this.props.move(indexA, indexB)}
-            container={()=>useContainer ? this.refs.container : document.body}
-            />
+          <FieldArray
+            name='planets'
+            planets={planets}
+            component={renderPlanets} />
         </div>
       </div>
     );
   }
 }
 
-export default connect(
-  state => state,
-  dispatch => ({
-    move: (indexA, indexB) => {
-      console.log('move', indexA, indexB);
-      dispatch({
-        type: 'MOVE',
-        payload: {indexA, indexB}
-      })
+App = reduxForm({
+  form: 'test',
+})(App)
+
+App = connect(
+  state => ({
+    initialValues: {
+      planets: state.planets
     }
   })
 )(App)
+
+export default App
